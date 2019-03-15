@@ -1,0 +1,13 @@
+{
+  "name": "shrink-yarn-lock",
+  "version": "1.0.0",
+  "description": "Merges dependencies with others satisfying package version constraint",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "shrink": "node index.js"
+  },
+  "dependencies": {
+    "semver-match": "^0.1.1"
+  }
+}
