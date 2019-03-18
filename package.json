@@ -1,6 +1,6 @@
 {
   "name": "shrink-yarn-lock",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Merges dependencies with others satisfying package version constraint",
   "main": "index.js",
   "license": "MIT",
@@ -11,12 +11,12 @@
     "semver-match": "^0.1.1"
   },
   "author": {
-    "name" : "Aleksei Tsikov",
-    "url" : "https://github.com/atsikov"
+    "name": "Aleksei Tsikov",
+    "url": "https://github.com/atsikov"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/atsikov/shrink-yarn-lock"
+    "type": "git",
+    "url": "https://github.com/atsikov/shrink-yarn-lock"
   },
   "keywords": [
     "yarn",
