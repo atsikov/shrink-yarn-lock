@@ -19,7 +19,7 @@
     "url": "https://github.com/atsikov/shrink-yarn-lock"
   },
   "bin": {
-    "shrink-yarn-lock": "./index.js"
+    "shrink-yarn-lock": "index.js"
   },
   "keywords": [
     "yarn",
