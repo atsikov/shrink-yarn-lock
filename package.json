@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "shrink": "node index.js"
+    "shrink-yarn-lock": "./index.js"
   },
   "dependencies": {
     "semver-match": "^0.1.1"
@@ -17,6 +17,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/atsikov/shrink-yarn-lock"
+  },
+  "bin": {
+    "shrink-yarn-lock": "./index.js"
   },
   "keywords": [
     "yarn",

@@ -51,6 +51,9 @@ ajv@^6.1.0, ajv@^6.5.5, ajv@^6.6.1:
 ```
 
 ### Usage
-`yarn shrink-yarn-lock <path to yarn.lock>`
+```
+npm i -g shrink-yarn-lock
+shrink-yarn-lock <path to yarn.lock>
+```
 
 Then run `yarn` to make sure your lock file is valid and to remove obsolete dependencies which might have been referenced by older versions of merged packages.
