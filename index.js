@@ -5,13 +5,19 @@ var path = require("path");
 var utils = require("./utils");
 var semverMatch = require("semver-match");
 
-var yarnLockPath = process.argv[process.argv.length - 1];
-if (!yarnLockPath || yarnLockPath.lastIndexOf(".lock") !== yarnLockPath.length - 5) {
-    console.log("Usage: yarn shrink <path to yarn.lock>");
+var yarnLockPathParam = process.argv[process.argv.length - 1];
+var yarnLockPath = path.resolve(
+    process.cwd(),
+    yarnLockPathParam && yarnLockPathParam.lastIndexOf(".lock") === yarnLockPathParam.length - 5
+        ? yarnLockPathParam
+        : "yarn.lock",
+);
+
+if (!fs.existsSync(yarnLockPath)) {
+    console.log("yarn.lock is not found at " + yarnLockPath);
+    console.log("Usage: shrink-yarn-lock <optional: path to yarn.lock file>");
     process.exit(1);
 }
-
-yarnLockPath = path.resolve(__dirname, yarnLockPath);
 
 var yarnLockRawContent;
 try {
@@ -45,27 +51,36 @@ while (pos < yarnLockRawContent.length) {
     }
 
     if (!yarnLockEntries[entryHeader.package]) {
-        yarnLockEntries[entryHeader.package] = {};
+        yarnLockEntries[entryHeader.package] = {
+            versions: {},
+            entries: [],
+        };
     }
 
-    entryHeader.versions.forEach(function(version) {
+    var packageVersions = yarnLockEntries[entryHeader.package].versions;
+
+    entryHeader.entries.forEach(function(entry) {
         var matches = entryContents.match(reEntryInstalledVersion);
         if (!matches) {
-            console.log(entryContents);
             throw new Error("Unable to get installed package version");
         }
-        yarnLockEntries[entryHeader.package][version] = {
-            version: matches[1],
+        var installedVersion = matches[1];
+        var packageVersion = entry.version !== -1 ? entry.version : installedVersion;
+        packageVersions[packageVersion] = {
+            version: installedVersion,
             contents: entryContents,
         };
     });
+
+    yarnLockEntries[entryHeader.package].entries = yarnLockEntries[entryHeader.package].entries.concat(entryHeader.entries);
 }
 
 var mergedEntries = Object.keys(yarnLockEntries).reduce(function(merged, package) {
     var packageEntry = yarnLockEntries[package];
-    var requiredVersions = Object.keys(packageEntry);
+    var packageVersions = packageEntry.versions;
+    var requiredVersions = Object.keys(packageVersions);
     var installedVersions = requiredVersions.reduce(function(acc, version) {
-        var installed = packageEntry[version];
+        var installed = packageVersions[version];
         if (acc.every(function(entry) { return entry.version !== installed.version; })) {
             acc.push(installed);
         }
@@ -73,7 +88,12 @@ var mergedEntries = Object.keys(yarnLockEntries).reduce(function(merged, package
     }, []);
 
     var suitableVersions = requiredVersions.reduce(function(acc, version) {
-        var matchedVersion = semverMatch(version, installedVersions.map(installed => installed.version)) || packageEntry[version].version;
+        var matchedVersion = semverMatch(
+            version,
+            installedVersions.map(function(installed) {
+                return installed.version;
+            })
+        ) || packageVersions[version].version;
         if (!acc[matchedVersion]) {
             acc[matchedVersion] = [];
         }
@@ -95,4 +115,7 @@ var mergedEntries = Object.keys(yarnLockEntries).reduce(function(merged, package
     return merged;
 }, {});
 
-fs.writeFileSync(yarnLockPath, utils.createYarnLock(yarnLockHeader, mergedEntries));
+fs.writeFileSync(
+    yarnLockPath, 
+    utils.createYarnLock(yarnLockHeader, yarnLockEntries, mergedEntries),
+);
