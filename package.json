@@ -1,6 +1,6 @@
 {
   "name": "shrink-yarn-lock",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Merges dependencies with others satisfying package version constraint",
   "main": "index.js",
   "license": "MIT",
